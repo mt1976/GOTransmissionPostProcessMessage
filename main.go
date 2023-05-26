@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 	"time"
 
-	pushover "github.com/gregdel/pushover"
+	xlogs "github.com/mt1976/appFrame/logs"
+	xpush "github.com/mt1976/appFrame/pushover"
 )
 
 type TransmissionEnvironment struct {
@@ -21,28 +21,32 @@ type TransmissionEnvironment struct {
 }
 
 func main() {
-	log.Println("Sending Push Notification to Pushover")
+	xlogs.Info("Sending Push Notification to Pushover")
 
 	env := CatchEnvironment()
 
 	Debug(env)
 
-	log.Println("POO", env.TR_TORRENT_NAME, "WEE")
-
 	// Pushover API Token
-	apiToken := "azjcvqy7ajf9i875ndinapzg7focya"
-	userToken := "uyosdopsu9wxxo7b264bmnnhbfz8nj"
+	//	apiToken := "azjcvqy7ajf9i875ndinapzg7focya"
+	//	userToken := "uyosdopsu9wxxo7b264bmnnhbfz8nj"
+	title := "This is the message Subject"
+	body := "This is the message body!!!"
 
-	apiPushover := pushover.New(apiToken)
-	msgRecipient := pushover.NewRecipient(userToken)
+	//var fields xlogs.Fields
+	xlogs.WithFields(xlogs.Fields{"Subject": title, "Body": body}).Info("Sending Message...")
+	xpush.Normal(title, body)
+	xlogs.Info("Message Sent")
+	//apiPushover := pushover.New(apiToken)
+	//msgRecipient := pushover.NewRecipient(userToken)
 
-	msgText := pushover.NewMessage("Hello from Go!")
+	//msgText := pushover.NewMessage("Hello from Go!")
 
-	response, err := apiPushover.SendMessage(msgText, msgRecipient)
-	if err != nil {
-		log.Panicln(err)
-	}
-	log.Println(response)
+	//response, err := apiPushover.SendMessage(msgText, msgRecipient)
+	//if err != nil {
+	//	log.Panicln(err)
+	//}
+	//log.Println(response)
 }
 
 func CatchEnvironment() TransmissionEnvironment {
@@ -56,7 +60,7 @@ func CatchEnvironment() TransmissionEnvironment {
 		// Time Example : "Tue Dec 13 06:24:36 2016"
 		nt, err := time.Parse("Mon Jan 2 15:04:05 2006", lt)
 		if err != nil {
-			log.Println("Error", err)
+			xlogs.Println("Error", err)
 			t.TR_TIME_LOCALTIME = time.Now()
 		}
 		t.TR_TIME_LOCALTIME = nt
@@ -76,21 +80,21 @@ func Get(v string) string {
 	r := os.Getenv(v)
 	//log.Println(v, r)
 	if r == "" {
-		log.Println("Environment Variable", v, "is not set")
+		//xlogs.Println("Environment Variable", v, "is not set")
 		return ""
 	}
 	return r
 }
 
 func Debug(t TransmissionEnvironment) {
-	log.Println("TR_APP_VERSION", t.TR_APP_VERSION)
-	log.Println("TR_TIME_LOCALTIME", t.TR_TIME_LOCALTIME.Format("Mon Jan 2 15:04:05 2006"))
-	log.Println("TR_TORRENT_BYTES_DOWNLOADED", t.TR_TORRENT_BYTES_DOWNLOADED)
-	log.Println("TR_TORRENT_DIR", t.TR_TORRENT_DIR)
-	log.Println("TR_TORRENT_HASH", t.TR_TORRENT_HASH)
-	log.Println("TR_TORRENT_ID", t.TR_TORRENT_ID)
-	log.Println("TR_TORRENT_LABELS", t.TR_TORRENT_LABELS)
-	log.Println("TR_TORRENT_NAME", t.TR_TORRENT_NAME)
-	log.Println("TR_TORRENT_TRACKERS", t.TR_TORRENT_TRACKERS)
+	dbgtxt := "Env"
+	xlogs.WithFields(xlogs.Fields{"TR_APP_VERSION": t.TR_APP_VERSION, "TR_TIME_LOCALTIME": t.TR_TIME_LOCALTIME.Format("Mon Jan 2 15:04:05 2006")}).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_BYTES_DOWNLOADED", t.TR_TORRENT_BYTES_DOWNLOADED).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_DIR", t.TR_TORRENT_DIR).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_HASH", t.TR_TORRENT_HASH).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_ID", t.TR_TORRENT_ID).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_LABELS", t.TR_TORRENT_LABELS).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_NAME", t.TR_TORRENT_NAME).Info(dbgtxt)
+	xlogs.WithField("TR_TORRENT_TRACKERS", t.TR_TORRENT_TRACKERS).Info(dbgtxt)
 
 }
