@@ -30,11 +30,14 @@ func main() {
 	// Pushover API Token
 	//	apiToken := "azjcvqy7ajf9i875ndinapzg7focya"
 	//	userToken := "uyosdopsu9wxxo7b264bmnnhbfz8nj"
-	title := "This is the message Subject"
-	body := "This is the message body!!!"
-
+	title := "Torrent Complete"
+	body := "Torrent Completed"
+	if env.TR_TORRENT_NAME != "" {
+		body = body + env.TR_TORRENT_NAME
+	}
+	body = body + " at " + env.TR_TIME_LOCALTIME.Format("15:04:05 on Mon Jan 2 2006")
 	//var fields xlogs.Fields
-	xlogs.WithFields(xlogs.Fields{"Subject": title, "Body": body}).Info("Sending Message...")
+	xlogs.WithFields(xlogs.Fields{"SUBJECT": title, "BODY": body}).Info("Sending Message...")
 	xpush.Normal(title, body)
 	xlogs.Info("Message Sent")
 	//apiPushover := pushover.New(apiToken)
@@ -88,13 +91,18 @@ func Get(v string) string {
 
 func Debug(t TransmissionEnvironment) {
 	dbgtxt := "Env"
-	xlogs.WithFields(xlogs.Fields{"TR_APP_VERSION": t.TR_APP_VERSION, "TR_TIME_LOCALTIME": t.TR_TIME_LOCALTIME.Format("Mon Jan 2 15:04:05 2006")}).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_BYTES_DOWNLOADED", t.TR_TORRENT_BYTES_DOWNLOADED).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_DIR", t.TR_TORRENT_DIR).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_HASH", t.TR_TORRENT_HASH).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_ID", t.TR_TORRENT_ID).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_LABELS", t.TR_TORRENT_LABELS).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_NAME", t.TR_TORRENT_NAME).Info(dbgtxt)
-	xlogs.WithField("TR_TORRENT_TRACKERS", t.TR_TORRENT_TRACKERS).Info(dbgtxt)
+	dbgFields := xlogs.Fields{
+		"VERSION":          t.TR_APP_VERSION,
+		"TIME":             t.TR_TIME_LOCALTIME.Format("Mon Jan 2 15:04:05 2006"),
+		"BYTES_DOWNLOADED": t.TR_TORRENT_BYTES_DOWNLOADED,
+		"DIR":              t.TR_TORRENT_DIR,
+		"HASH":             t.TR_TORRENT_HASH,
+		"ID":               t.TR_TORRENT_ID,
+		"LABELS":           t.TR_TORRENT_LABELS,
+		"NAME":             t.TR_TORRENT_NAME,
+		"TRACKERS":         t.TR_TORRENT_TRACKERS,
+	}
+
+	xlogs.WithFields(dbgFields).Info(dbgtxt)
 
 }
